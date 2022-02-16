@@ -64,23 +64,23 @@ contract Simcade is Ownable {
 
     /**
      * @dev Withdraw funds from address.
-     * @param withdrawlAmount the amout to be withdrawn
+     * @param withdrawalAmount the amout to be withdrawn
      */
-    function withdraw(uint256 withdrawlAmount)
+    function withdraw(uint256 withdrawalAmount)
         public
-        sufficientFunds(withdrawlAmount)
+        sufficientFunds(withdrawalAmount)
         returns (bool)
     {
         require(
-            getBalance() >= withdrawlAmount,
-            "Insufficient reserves to process this withdrawl."
+            getBalance() >= withdrawalAmount,
+            "Insufficient reserves to process this withdrawal."
         );
-        address payable withdrawlAddress = payable(msg.sender);
-        (bool sent, ) = withdrawlAddress.call{value: withdrawlAmount}("");
+        address payable withdrawalAddress = payable(msg.sender);
+        (bool sent, ) = withdrawalAddress.call{value: withdrawalAmount}("");
 
         if (sent) {
-            balances[msg.sender] -= withdrawlAmount;
-            totalPlayerValue -= withdrawlAmount;
+            balances[msg.sender] -= withdrawalAmount;
+            totalPlayerValue -= withdrawalAmount;
         }
         return sent;
     }

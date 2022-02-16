@@ -39,7 +39,7 @@ describe("Simcade", function () {
 
     it("Should withdraw", async function () {
         try {
-            await simcadeInstance.withdraw(1000000); // too big of a withdrawl
+            await simcadeInstance.withdraw(1000000); // too big of a withdrawal
         } catch (e) {
             expect(e.code).to.eql('INSUFFICIENT_FUNDS');
         }
