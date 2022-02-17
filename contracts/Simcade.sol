@@ -7,7 +7,7 @@ contract Simcade is Ownable {
     uint256 public GAME_FEE = 500; // gas fee paid to team wallet to validate each game
     uint256 public MAX_BET_SIZE = 100000; // maximum bet size
 
-    uint256 totalPlayerValue = 0;
+    uint256 totalPlayerValue = 0; // combined value of all player wallets
     mapping(string => bool) games; // a mapping of each game to if it is valid
     mapping(address => uint256) balances; // a mapping of each address to its balance
 
