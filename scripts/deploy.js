@@ -1,10 +1,10 @@
 async function main() {
-    const Simcade = await ethers.getContractFactory("Simcade")
+    const MoneyCarlo = await ethers.getContractFactory("MoneyCarlo")
 
     // Start deployment, returning a promise that resolves to a contract object
-    const simcadeInstance = await Simcade.deploy()
-    await simcadeInstance.deployed()
-    console.log("Contract deployed to address:", simcadeInstance.address)
+    const moneyCarloInstance = await MoneyCarlo.deploy()
+    await moneyCarloInstance.deployed()
+    console.log("Contract deployed to address:", moneyCarloInstance.address)
 }
 
 main()

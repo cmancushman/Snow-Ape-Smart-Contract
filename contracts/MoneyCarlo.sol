@@ -3,7 +3,7 @@ pragma solidity ^0.8.1;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract Simcade is Ownable {
+contract MoneyCarlo is Ownable {
     uint256 public GAME_FEE = 500; // gas fee paid to team wallet to validate each game
     uint256 public MAX_BET_SIZE = 100000; // maximum bet size
 
