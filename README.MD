@@ -20,3 +20,7 @@
 ## Some notes
 - This is not a trustless smart contract. Though there are some checks put in place (max bet size) there are aspects of it that are centralized. 
 - It is meant to be deployed by a good-faith actor i.e an organization with feduciary responsibilities.
+
+## Gas Estimates by Operation
+The following is the average gas consumption by each operation completed in the testing suite:
+![alt text](./GasEstimates.png)

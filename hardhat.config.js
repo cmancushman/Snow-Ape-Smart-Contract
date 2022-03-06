@@ -3,6 +3,8 @@
 */
 require('dotenv').config();
 require("@nomiclabs/hardhat-ethers");
+require("hardhat-gas-reporter");
+
 const { API_URL, PRIVATE_KEY } = process.env;
 
 // switch network from hardhat to ropsten to deploy.
