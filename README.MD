@@ -1,4 +1,4 @@
-# Money Carlo Smart Contract 
+# Snow Ape Smart Contract 
 ## Abstract
 - Gaming and user-driven websites not yet at-scale suffer from deposit/withdrawal delays and struggle to earn user trust. Use of funds is not apparent, nor is liquidity in a centralized custodial service such as Robinhood, Draftkings, Fanduel, etc.. They are used and trusted because of their brand awareness and reputation, not because of their transparency or ability to handle funds. This situation that faces less prominent custodial entities can be improved by moving the custody of funds from internal reserves to an external smart contract.
 
