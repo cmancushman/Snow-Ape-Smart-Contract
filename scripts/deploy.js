@@ -1,5 +1,5 @@
 async function main() {
-    const MoneyCarlo = await ethers.getContractFactory("MoneyCarlo")
+    const MoneyCarlo = await ethers.getContractFactory("SnowApeContractV3")
 
     // Start deployment, returning a promise that resolves to a contract object
     const moneyCarloInstance = await MoneyCarlo.deploy()
