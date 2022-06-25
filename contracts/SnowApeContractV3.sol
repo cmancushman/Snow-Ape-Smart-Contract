@@ -4,36 +4,46 @@ pragma solidity ^0.8.1;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
-/**
- * This updated contract implements a 'betting pool' which is facilitated by the contract owner.
- * The contract owner no longer has permission to withdraw directly from the smart contract; rather,
- * they only have the ability to control how the betting pool is distributed.
- *
- * Additions/changes: bettingPoolBalance, getBettingPoolBalance, initializeOnePlayerGame, determineOutputOfOnePlayerGame
- */
 contract SnowApeContractV3 is Ownable {
-    uint16[] public LEAGUE_NONCES = [0, 0, 0];
+    uint16[] public LEAGUE_NONCES; // nonce for leagues
+    uint256[] public FLAT_LEAGUE_FEES; // additional flat fee for leagues, otherwise time-based
+    uint256[] public LEAGUE_FEES; // base fee to join leagues
 
-    uint256[] public LEAGUE_FEES = [
-        10000000000000000, // monkey league
-        100000000000000000, // gorilla league
-        1000000000000000000 // kong league
-    ];
+    uint8 public LATE_FEE_DIVISOR = 5; // (100 / LATE_FEE_DIVISOR) = the late fee percentage added per-day
 
     address private payoutAddress;
 
-    mapping(uint16 => mapping(uint16 => uint32)) LEAGUE_PLAYER_COUNTS;
-    mapping(uint16 => mapping(uint16 => uint256)) LEAGUE_TOTAL_FEES;
-    mapping(uint16 => mapping(uint16 => mapping(address => uint16))) portfolioCounts;
-    mapping(uint16 => uint256) lastLeagueStartDates;
+    mapping(uint16 => mapping(uint16 => uint32)) public LEAGUE_PLAYER_COUNTS;
+    mapping(uint16 => mapping(uint16 => uint256)) public LEAGUE_TOTAL_FEES;
+    mapping(uint16 => mapping(uint16 => mapping(address => uint16)))
+        public portfolioCounts;
+    mapping(uint16 => uint256) public lastLeagueStartDates;
+
+    constructor(uint16[] memory nonces, uint256[] memory fees, uint256[] memory flatFees) {
+        LEAGUE_NONCES = nonces;
+        LEAGUE_FEES = fees;
+        FLAT_LEAGUE_FEES = flatFees;
+    }
+
+    /**
+     * Gets the current seconds since 1970 in east coast time
+     * @return seconds
+     */
+    function getEastCoastSeconds() private view returns (uint256) {
+        return block.timestamp - 14400;
+    }
 
     /**
      * Calculates the fee based on the number of days that have occured since the league was started
      * @param leagueId the league on which to calculate the fee
      * @return fee
      */
-    function getFee(uint16 leagueId) private view returns (uint256) {
-        uint256 day = block.timestamp / 86400;
+    function getFee(uint16 leagueId) public view returns (uint256) {
+        if (FLAT_LEAGUE_FEES[leagueId] != 0) {
+            return LEAGUE_FEES[leagueId] + FLAT_LEAGUE_FEES[leagueId];
+        }
+
+        uint256 day = getEastCoastSeconds() / 86400;
         uint256 leagueFee = LEAGUE_FEES[leagueId];
         uint256 leagueStartDay = lastLeagueStartDates[leagueId];
 
@@ -42,7 +52,10 @@ contract SnowApeContractV3 is Ownable {
             return leagueFee;
         }
 
-        return leagueFee + (leagueFee / 10) * (day - 2 - leagueStartDay);
+        uint256 daysSinceStartMultiplier = day - 2 - leagueStartDay;
+        uint256 lateFee = (leagueFee / LATE_FEE_DIVISOR) *
+            daysSinceStartMultiplier;
+        return leagueFee + lateFee;
     }
 
     /**
@@ -132,7 +145,7 @@ contract SnowApeContractV3 is Ownable {
         uint256 payoutPerWinner = payout / players.length;
         uint256 roundingExtra = payout - (payoutPerWinner * players.length);
 
-        for (uint8 i = 0; i < players.length; i++) {
+        for (uint32 i = 0; i < players.length; i++) {
             require(
                 portfolioCounts[leagueId][leagueNonce][players[i]] > 0,
                 "Not a valid player"
@@ -156,7 +169,7 @@ contract SnowApeContractV3 is Ownable {
         }
 
         LEAGUE_NONCES[leagueId]++;
-        lastLeagueStartDates[leagueId] = block.timestamp / 86400;
+        lastLeagueStartDates[leagueId] = getEastCoastSeconds() / 86400;
     }
 
     /**
@@ -181,7 +194,7 @@ contract SnowApeContractV3 is Ownable {
         }
 
         LEAGUE_NONCES[leagueId]++;
-        lastLeagueStartDates[leagueId] = block.timestamp / 86400;
+        lastLeagueStartDates[leagueId] = getEastCoastSeconds() / 86400;
 
         uint16 newLeagueNonce = LEAGUE_NONCES[leagueId];
 
@@ -189,11 +202,11 @@ contract SnowApeContractV3 is Ownable {
         LEAGUE_TOTAL_FEES[leagueId][newLeagueNonce] = payout;
     }
 
-    function addLeague(uint256 leagueFee) public onlyOwner returns (uint256) {
+    function addLeague(uint256 leagueFee, uint256 flatFee) public onlyOwner returns (uint256) {
         LEAGUE_FEES.push(leagueFee);
+        FLAT_LEAGUE_FEES.push(flatFee);
         LEAGUE_NONCES.push(0);
 
         return LEAGUE_FEES.length - 1;
     }
 }
- 
